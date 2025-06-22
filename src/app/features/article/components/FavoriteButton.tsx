@@ -25,14 +25,37 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     setIsSubmitting(true);
 
     try {
+      const isAuthenticated = false; // Placeholder - needs UserService equivalent
       
-      const newFavoritedState = !article.favorited;
-      onToggle(newFavoritedState);
+      if (!isAuthenticated) {
+        console.log('User not authenticated, should redirect to /register');
+        setIsSubmitting(false);
+        return;
+      }
+
+      let updatedArticle;
+      if (!article.favorited) {
+        updatedArticle = await mockFavoriteAPI(article.slug);
+      } else {
+        updatedArticle = await mockUnfavoriteAPI(article.slug);
+      }
+
+      onToggle(!article.favorited);
     } catch (error) {
       console.error('Error toggling favorite:', error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const mockFavoriteAPI = async (slug: string) => {
+    console.log(`Mock API: Favoriting article ${slug}`);
+    return Promise.resolve({ favorited: true });
+  };
+
+  const mockUnfavoriteAPI = async (slug: string) => {
+    console.log(`Mock API: Unfavoriting article ${slug}`);
+    return Promise.resolve({ favorited: false });
   };
 
   const buttonClasses = [
