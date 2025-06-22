@@ -35,5 +35,21 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     }
   };
 
-  return null; // Template will be implemented in next step
+  const buttonClasses = [
+    'btn',
+    'btn-sm',
+    isSubmitting ? 'disabled' : '',
+    article.favorited ? 'btn-primary' : 'btn-outline-primary',
+    className
+  ].filter(Boolean).join(' ');
+
+  return (
+    <button
+      className={buttonClasses}
+      onClick={toggleFavorite}
+      disabled={isSubmitting}
+    >
+      <i className="ion-heart"></i> {children}
+    </button>
+  );
 };
