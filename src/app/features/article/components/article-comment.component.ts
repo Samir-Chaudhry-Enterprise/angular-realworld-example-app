@@ -5,6 +5,7 @@ import { RouterLink } from "@angular/router";
 import { map } from "rxjs/operators";
 import { Comment } from "../models/comment.model";
 import { AsyncPipe, DatePipe } from "@angular/common";
+import { CommentFavoriteButtonComponent } from "./comment-favorite-button.component";
 
 @Component({
   selector: "app-article-comment",
@@ -33,20 +34,32 @@ import { AsyncPipe, DatePipe } from "@angular/common";
           <span class="date-posted">
             {{ comment.createdAt | date: "longDate" }}
           </span>
-          @if (canModify$ | async) {
-            <span class="mod-options">
-              <i class="ion-trash-a" (click)="delete.emit(true)"></i>
-            </span>
-          }
+          <span class="comment-actions">
+            <app-comment-favorite-button
+              [comment]="comment"
+              [articleSlug]="articleSlug"
+              (toggle)="onFavoriteToggle($event)"
+            ></app-comment-favorite-button>
+            @if (canModify$ | async) {
+              <span class="mod-options">
+                <i class="ion-trash-a" (click)="delete.emit(true)"></i>
+              </span>
+            }
+          </span>
         </div>
       </div>
     }
   `,
-  imports: [RouterLink, DatePipe, AsyncPipe],
+  imports: [RouterLink, DatePipe, AsyncPipe, CommentFavoriteButtonComponent],
 })
 export class ArticleCommentComponent {
   @Input() comment!: Comment;
+  @Input() articleSlug!: string;
   @Output() delete = new EventEmitter<boolean>();
+  @Output() favoriteToggle = new EventEmitter<{
+    comment: Comment;
+    favorited: boolean;
+  }>();
 
   canModify$ = inject(UserService).currentUser.pipe(
     map(
@@ -54,4 +67,14 @@ export class ArticleCommentComponent {
         userData?.username === this.comment.author.username,
     ),
   );
+
+  onFavoriteToggle(favorited: boolean): void {
+    this.comment.favorited = favorited;
+    if (favorited) {
+      this.comment.favoritesCount++;
+    } else {
+      this.comment.favoritesCount--;
+    }
+    this.favoriteToggle.emit({ comment: this.comment, favorited });
+  }
 }

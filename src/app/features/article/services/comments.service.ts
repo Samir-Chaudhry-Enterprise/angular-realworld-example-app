@@ -25,4 +25,18 @@ export class CommentsService {
   delete(commentId: string, slug: string): Observable<void> {
     return this.http.delete<void>(`/articles/${slug}/comments/${commentId}`);
   }
+
+  favorite(commentId: string, slug: string): Observable<Comment> {
+    return this.http
+      .post<{
+        comment: Comment;
+      }>(`/articles/${slug}/comments/${commentId}/favorite`, {})
+      .pipe(map((data) => data.comment));
+  }
+
+  unfavorite(commentId: string, slug: string): Observable<void> {
+    return this.http.delete<void>(
+      `/articles/${slug}/comments/${commentId}/favorite`,
+    );
+  }
 }
