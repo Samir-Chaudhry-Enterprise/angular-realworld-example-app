@@ -135,4 +135,16 @@ export default class ArticleComponent implements OnInit {
         this.comments = this.comments.filter((item) => item !== comment);
       });
   }
+
+  onCommentFavoriteToggle(event: {
+    comment: Comment;
+    favorited: boolean;
+  }): void {
+    const commentIndex = this.comments.findIndex(
+      (c) => c.id === event.comment.id,
+    );
+    if (commentIndex !== -1) {
+      this.comments[commentIndex] = event.comment;
+    }
+  }
 }
